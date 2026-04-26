@@ -29,6 +29,8 @@ const Profile = () => {
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteError, setDeleteError] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
 
   const formatDateRange = (startDate, endDate) => {
     const start = new Date(startDate).toLocaleDateString();
