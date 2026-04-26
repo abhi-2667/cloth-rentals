@@ -3,7 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { ToastContext } from '../context/ToastContext';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
-import { Clock3, UserCircle2, Wallet, BadgeCheck, CheckCircle2, Sparkles, Star, ShoppingBag } from 'lucide-react';
+import { Clock3, UserCircle2, Wallet, BadgeCheck, CheckCircle2, Sparkles, ShoppingBag } from 'lucide-react';
 import { getClothImageSrc } from '../utils/visuals';
 import { formatINR } from '../utils/currency';
 
@@ -442,14 +442,6 @@ const Profile = () => {
                     <span className={`profile-status-chip ${booking.status === 'returned' ? 'is-returned' : booking.status === 'cancelled' ? 'is-cancelled' : booking.status === 'return_requested' ? 'is-booked' : 'is-booked'}`} style={{ borderColor: booking.status === 'return_requested' ? '#f59e0b' : '', color: booking.status === 'return_requested' ? '#f59e0b' : '' }}>
                       {booking.status.replace('_', ' ').toUpperCase()}
                     </span>
-                    {booking.status === 'returned' && (
-                      <Link
-                        to={'/cloth/' + (booking.clothId?._id || booking.clothId)}
-                        style={{ fontSize: '0.78rem', color: 'var(--primary-color)', marginTop: '0.3rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
-                      >
-                        <Star size={12} />Leave a review
-                      </Link>
-                    )}
                     {booking.status === 'booked' && (
                       <button
                         type="button"
