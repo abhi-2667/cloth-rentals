@@ -122,6 +122,8 @@ const BookingPage = () => {
     .filter(Boolean);
   const selectedRange = startDate && endDate
     ? { from: toDateOnly(startDate), to: toDateOnly(endDate) }
+    : startDate
+    ? { from: toDateOnly(startDate) }
     : undefined;
   const days = startDate && endDate
     ? Math.max(1, Math.ceil((toDateOnly(endDate) - toDateOnly(startDate)) / (1000 * 60 * 60 * 24)))
@@ -239,13 +241,28 @@ const BookingPage = () => {
                                 numberOfMonths={1}
                                 selected={selectedRange}
                                 onSelect={(range) => {
-                                  setStartDate(range?.from ? range.from.toISOString().split('T')[0] : '');
-                                  setEndDate(range?.to ? range.to.toISOString().split('T')[0] : '');
+                                  if (!range) {
+                                    setStartDate('');
+                                    setEndDate('');
+                                    return;
+                                  }
+
+                                  // Always update start date if provided
+                                  if (range.from) {
+                                    setStartDate(range.from.toISOString().split('T')[0]);
+                                  }
+
+                                  // First click: only from is set, clear end and keep calendar open
+                                  // Second click: both set, update end and close calendar
+                                  if (range.to) {
+                                    setEndDate(range.to.toISOString().split('T')[0]);
+                                    setIsCalendarOpen(false);
+                                  } else {
+                                    setEndDate('');
+                                  }
+
                                   setError('');
                                   setSuccess('');
-                                  if (range?.from && range?.to) {
-                                    setIsCalendarOpen(false);
-                                  }
                                 }}
                                 disabled={[{ before: today }, ...blockedCalendarRanges]}
                                 modifiers={{ booked: blockedCalendarRanges }}
