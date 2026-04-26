@@ -8,7 +8,7 @@ import { getEditorialPanelSrc } from '../utils/visuals';
 const HERO_IMG     = 'https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?q=80&w=900&auto=format&fit=crop';
 const PARTY_IMG    = 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=900&auto=format&fit=crop';
 const OCCASION_WEDDING_IMG = 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=900&auto=format&fit=crop';
-const OCCASION_PARTY_IMG   = 'https://images.unsplash.com/photo-1566479179817-c0b5b4b4b3c8?q=80&w=900&auto=format&fit=crop';
+const OCCASION_PARTY_IMG   = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=900&auto=format&fit=crop';
 const OCCASION_ETHNIC_IMG  = 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop';
 const OCCASION_FAREWELL_IMG = 'https://images.unsplash.com/photo-1614252369475-531eba835eb1?q=80&w=900&auto=format&fit=crop';
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=900&auto=format&fit=crop';
