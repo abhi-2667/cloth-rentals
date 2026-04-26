@@ -1,0 +1,165 @@
+{
+  "info": {
+    "name": "Cloth Rental API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection for key auth, booking, and admin approval flows."
+  },
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman User\",\n  \"email\": \"{{$timestamp}}.user@example.com\",\n  \"password\": \"StrongPass123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@cloth-rental.local\",\n  \"password\": \"Admin1234!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Bookings - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clothId\": \"{{clothId}}\",\n  \"startDate\": \"2026-04-25\",\n  \"endDate\": \"2026-04-28\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/bookings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Users - List (Admin)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/users",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Users - Approve (Admin)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"approvalStatus\": \"approved\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/users/{{userId}}/approval",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "{{userId}}",
+            "approval"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "clothId",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    }
+  ]
+}
