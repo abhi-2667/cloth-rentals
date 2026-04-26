@@ -93,11 +93,11 @@ const BookingPage = () => {
       }
     };
 
-    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('pointerup', handlePointerDown);
     document.addEventListener('keydown', handleEscape);
 
     return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('pointerup', handlePointerDown);
       document.removeEventListener('keydown', handleEscape);
     };
   }, []);
