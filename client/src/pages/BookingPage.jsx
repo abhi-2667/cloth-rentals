@@ -1,6 +1,5 @@
-import { lazy, Suspense, useMemo, useState, useEffect, useContext, useRef } from 'react';
+import { useMemo, useState, useEffect, useContext } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import 'react-day-picker/dist/style.css';
 import { AuthContext } from '../context/AuthContext';
 import { ToastContext } from '../context/ToastContext';
 import api from '../utils/api';
@@ -8,90 +7,10 @@ import { ArrowLeft, Calendar, ChevronDown, Clock3 } from 'lucide-react';
 import { getClothImageSrc } from '../utils/visuals';
 import { formatINR } from '../utils/currency';
 
-const DayPicker = lazy(() => import('react-day-picker').then((mod) => ({ default: mod.DayPicker })));
-
 const toDateOnly = (value) => {
   const date = new Date(value);
   date.setHours(0, 0, 0, 0);
   return date;
-};
-
-const toCalendarRange = (range) => {
-  const from = toDateOnly(range.startDate);
-  const to = toDateOnly(range.endDate);
-  if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return null;
-  return { from, to };
-};
-
-const formatDisplayDate = (value) => {
-  if (!value) return '';
-  const date = new Date(`${value}T00:00:00`);
-  if (Number.isNaN(date.getTime())) return '';
-  return new Intl.DateTimeFormat('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric'
-  }).format(date);
-};
-
-// Reusable single-date popover picker
-const SingleDatePicker = ({ label, dateValue, onDateChange, disabledDays, bookedRanges, triggerClassName }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef(null);
-  const selected = dateValue ? toDateOnly(dateValue) : undefined;
-
-  useEffect(() => {
-    const handlePointerUp = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false);
-    };
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') setIsOpen(false);
-    };
-    document.addEventListener('pointerup', handlePointerUp);
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('pointerup', handlePointerUp);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, []);
-
-  return (
-    <div className="booking-date-popover" ref={ref}>
-      <button
-        type="button"
-        className={`form-control booking-date-trigger ${triggerClassName || ''}`}
-        onClick={() => setIsOpen((v) => !v)}
-        aria-expanded={isOpen}
-        aria-haspopup="dialog"
-      >
-        <span>{formatDisplayDate(dateValue) || label}</span>
-        <ChevronDown size={14} />
-      </button>
-
-      {isOpen && (
-        <div className="booking-calendar-popover">
-          <div className="booking-calendar-shell">
-            <Suspense fallback={<p className="booking-calendar-loading">Loading calendar...</p>}>
-              <DayPicker
-                className="booking-day-picker"
-                mode="single"
-                numberOfMonths={1}
-                selected={selected}
-                onSelect={(day) => {
-                  if (!day) return;
-                  onDateChange(day.toISOString().split('T')[0]);
-                  setIsOpen(false);
-                }}
-                disabled={disabledDays}
-                modifiers={{ booked: bookedRanges }}
-                modifiersClassNames={{ booked: 'rdp-day_booked' }}
-              />
-            </Suspense>
-          </div>
-        </div>
-      )}
-    </div>
-  );
 };
 
 const BookingPage = () => {
@@ -137,6 +56,16 @@ const BookingPage = () => {
     fetchBlockedRanges();
   }, [id]);
 
+  // Returns true if a single date string falls inside any blocked range
+  const isDateBlocked = (dateStr) => {
+    if (!dateStr) return false;
+    const d = toDateOnly(dateStr);
+    return blockedRanges.some((range) => {
+      return toDateOnly(range.startDate) <= d && d <= toDateOnly(range.endDate);
+    });
+  };
+
+  // Returns true if the selected start–end range overlaps any blocked range
   const selectedRangeOverlaps = useMemo(() => {
     if (!startDate || !endDate) return false;
     const selectedStart = toDateOnly(startDate);
@@ -148,33 +77,36 @@ const BookingPage = () => {
     });
   }, [startDate, endDate, blockedRanges]);
 
-  const today = toDateOnly(new Date());
-  const blockedCalendarRanges = blockedRanges.map(toCalendarRange).filter(Boolean);
+  const todayStr = new Date().toISOString().split('T')[0];
 
   const days = startDate && endDate
     ? Math.max(1, Math.ceil((toDateOnly(endDate) - toDateOnly(startDate)) / (1000 * 60 * 60 * 24)))
     : 0;
 
-  // End date picker disables everything before the chosen start date (or today if none)
-  const endDisabledDays = [
-    { before: startDate ? toDateOnly(startDate) : today },
-    ...blockedCalendarRanges
-  ];
-
-  const handleStartDateChange = (date) => {
-    setStartDate(date);
+  const handleStartDateChange = (e) => {
+    const val = e.target.value;
     setError('');
     setSuccess('');
-    // Clear end date if it's now before the new start date
-    if (endDate && toDateOnly(date) > toDateOnly(endDate)) {
-      setEndDate('');
+    if (isDateBlocked(val)) {
+      setStartDate('');
+      setError('That start date falls within an already-booked period. Please choose another date.');
+      return;
     }
+    setStartDate(val);
+    // Reset end date if it's now before or equal to the new start
+    if (endDate && endDate <= val) setEndDate('');
   };
 
-  const handleEndDateChange = (date) => {
-    setEndDate(date);
+  const handleEndDateChange = (e) => {
+    const val = e.target.value;
     setError('');
     setSuccess('');
+    if (isDateBlocked(val)) {
+      setEndDate('');
+      setError('That end date falls within an already-booked period. Please choose another date.');
+      return;
+    }
+    setEndDate(val);
   };
 
   const handleBooking = async (e) => {
@@ -200,7 +132,7 @@ const BookingPage = () => {
       await api.post('/bookings', {
         clothId: id,
         startDate: `${startDate}T${startTime}:00`,
-        endDate: `${endDate}T${endTime}:00`
+        endDate: `${endDate}T${endTime}:00`,
       });
       setSuccess('Booking successful! Redirecting to profile...');
       setTimeout(() => navigate('/profile'), 2000);
@@ -254,25 +186,25 @@ const BookingPage = () => {
               <div className="booking-form-title-row">
                 <div className={`booking-status-dot ${cloth.availability ? 'is-live' : 'is-offline'}`} />
                 <Calendar size={18} />
-                <span>Calendar</span>
+                <span>Select Dates</span>
               </div>
-              <p>Choose dates, times, and confirm when ready.</p>
+              <p>Choose your rental start and end dates.</p>
             </div>
 
             {error && <div className="booking-alert booking-alert-error">{error}</div>}
             {success && <div className="booking-alert booking-alert-success">{success}</div>}
 
             <div className="booking-stack booking-datetime-stack">
-              {/* START DATE ROW */}
+              {/* Start date */}
               <div className="booking-datetime-row">
                 <div className="booking-datetime-label">Start</div>
                 <div className="booking-datetime-fields">
-                  <SingleDatePicker
-                    label="Select date"
-                    dateValue={startDate}
-                    onDateChange={handleStartDateChange}
-                    disabledDays={[{ before: today }, ...blockedCalendarRanges]}
-                    bookedRanges={blockedCalendarRanges}
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={startDate}
+                    min={todayStr}
+                    onChange={handleStartDateChange}
                   />
                   <label className="booking-time-field">
                     <span className="booking-sr-label">Start time</span>
@@ -287,17 +219,16 @@ const BookingPage = () => {
                 </div>
               </div>
 
-              {/* END DATE ROW */}
+              {/* End date */}
               <div className="booking-datetime-row">
                 <div className="booking-datetime-label">End</div>
                 <div className="booking-datetime-fields">
-                  <SingleDatePicker
-                    label="Select date"
-                    dateValue={endDate}
-                    onDateChange={handleEndDateChange}
-                    disabledDays={endDisabledDays}
-                    bookedRanges={blockedCalendarRanges}
-                    triggerClassName="booking-date-trigger-static"
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={endDate}
+                    min={startDate || todayStr}
+                    onChange={handleEndDateChange}
                   />
                   <label className="booking-time-field">
                     <span className="booking-sr-label">End time</span>
@@ -313,10 +244,25 @@ const BookingPage = () => {
               </div>
             </div>
 
+            {/* Overlap warning */}
             {selectedRangeOverlaps && (
               <p className="booking-inline-note booking-inline-note-warning">
-                The selected date range is unavailable.
+                The selected date range overlaps with an existing booking. Please choose different dates.
               </p>
+            )}
+
+            {/* List booked ranges so users know what to avoid */}
+            {!isLoadingBlockedDates && blockedRanges.length > 0 && (
+              <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                <strong>Already booked:</strong>
+                <ul style={{ margin: '0.3rem 0 0 1rem', padding: 0 }}>
+                  {blockedRanges.map((range, i) => (
+                    <li key={i}>
+                      {new Date(range.startDate).toLocaleDateString()} – {new Date(range.endDate).toLocaleDateString()}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
 
             <div className="booking-total-row">
