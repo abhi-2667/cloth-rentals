@@ -78,23 +78,21 @@ app.use('/api', globalLimiter);
 // Main Entry Point
 const PORT = process.env.PORT || 5000;
 const useDevStore = !process.env.MONGO_URI;
-//const uploadsDir = path.resolve(__dirname, 'uploads');
+const uploadsDir = path.resolve(__dirname, 'uploads');
 
 // Routes
 const authRoutes = require('./routes/auth');
 const clothRoutes = require('./routes/clothes');
 const bookingRoutes = require('./routes/bookings');
 const userRoutes = require('./routes/users');
-const wishlistRoutes = require('./routes/wishlist');
-const reviewRoutes = require('./routes/reviews');
+
 
 app.use('/api/auth', authLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/clothes', clothRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/wishlist', wishlistRoutes);
-app.use('/api/reviews', reviewRoutes);
+
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', uptime: process.uptime() });
@@ -127,6 +125,13 @@ app.get('/', (req, res) => {
   res.send('Cloth Rental API Server is running...');
 });
 
+// Create upload directory if it doesn't exist for local testing fallback
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Map uploads folder for local storage serving
+app.use('/uploads', express.static(uploadsDir));
 
 let httpServer = null;
 
