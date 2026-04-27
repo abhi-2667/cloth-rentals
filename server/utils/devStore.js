@@ -5,8 +5,6 @@ const state = {
   users: [],
   clothes: [],
   bookings: [],
-  wishlistItems: [],
-  reviews: [],
   notifications: [],
   pendingSignups: [],
 };
@@ -614,8 +612,6 @@ const deleteUserAccount = (userId) => {
   }
 
   state.notifications = state.notifications.filter((notification) => notification.userId !== normalizedUserId);
-  state.wishlistItems = state.wishlistItems.filter((item) => item.userId !== normalizedUserId);
-  state.reviews = state.reviews.filter((review) => review.userId !== normalizedUserId);
 
   const normalizedEmail = String(user.email || '').toLowerCase();
   state.pendingSignups = state.pendingSignups.filter((item) => item.email.toLowerCase() !== normalizedEmail);
@@ -702,88 +698,6 @@ const listBookings = ({ userId, clothId, status, includeCloth = false, includeUs
 };
 
 const getAllBookings = () => listBookings({ includeCloth: true, includeUser: true });
-
-const listWishlistItems = (userId) => {
-  return state.wishlistItems
-    .filter((item) => item.userId === String(userId))
-    .map((item) => ({
-      ...clone(item),
-      clothId: getClothById(item.clothId),
-    }))
-    .filter((item) => Boolean(item.clothId));
-};
-
-const getWishlistItem = ({ userId, clothId }) => {
-  const record = state.wishlistItems.find(
-    (item) => item.userId === String(userId) && item.clothId === String(clothId)
-  );
-
-  return record ? clone(record) : null;
-};
-
-const addWishlistItem = ({ userId, clothId }) => {
-  const existing = getWishlistItem({ userId, clothId });
-  if (existing) return existing;
-
-  const wishlistItem = {
-    _id: createId(),
-    userId: String(userId),
-    clothId: String(clothId),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  state.wishlistItems.push(wishlistItem);
-  return clone(wishlistItem);
-};
-
-const removeWishlistItem = ({ userId, clothId }) => {
-  const index = state.wishlistItems.findIndex(
-    (item) => item.userId === String(userId) && item.clothId === String(clothId)
-  );
-
-  if (index === -1) return null;
-  const [removed] = state.wishlistItems.splice(index, 1);
-  return clone(removed);
-};
-
-const addReview = ({ userId, clothId, rating, comment }) => {
-  const review = {
-    _id: createId(),
-    userId: String(userId),
-    clothId: String(clothId),
-    rating: Number(rating),
-    comment: String(comment || '').trim(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  state.reviews.push(review);
-  return clone(review);
-};
-
-const listReviewsForCloth = (clothId) => {
-  return state.reviews
-    .filter((review) => review.clothId === String(clothId))
-    .sort((left, right) => new Date(right.createdAt) - new Date(left.createdAt))
-    .map((review) => {
-      const user = getUserById(review.userId);
-      return {
-        ...clone(review),
-        userId: user ? { _id: user._id, name: user.name, email: user.email } : review.userId,
-      };
-    });
-};
-
-const deleteReview = ({ reviewId, userId }) => {
-  const index = state.reviews.findIndex(
-    (review) => review._id === String(reviewId) && review.userId === String(userId)
-  );
-
-  if (index === -1) return null;
-  const [removed] = state.reviews.splice(index, 1);
-  return clone(removed);
-};
 
 const upsertPendingSignup = ({ name, email, password, linkExpiresAt }) => {
   const normalizedEmail = String(email).toLowerCase();
@@ -880,13 +794,7 @@ module.exports = {
   listBookings,
   getAllBookings,
   getUnavailableClothIdsForRange,
-  listWishlistItems,
-  getWishlistItem,
-  addWishlistItem,
-  removeWishlistItem,
-  addReview,
-  listReviewsForCloth,
-  deleteReview,
+
   upsertPendingSignup,
   getPendingSignupByEmail,
   deletePendingSignup,
