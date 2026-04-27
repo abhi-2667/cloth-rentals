@@ -171,7 +171,7 @@ const getAllBookings = async (req, res) => {
       return res.json(devStore.getAllBookings());
     }
 
-    const bookings = await Booking.find().populate('clothId').populate('userId', 'name email');
+   const bookings = await Booking.find().populate('clothId').populate('userId', 'name email phone address');
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ message: error.message });
