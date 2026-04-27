@@ -3,8 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Booking = require('../models/Booking');
 const Notification = require('../models/Notification');
-const Wishlist = require('../models/Wishlist');
-const Review = require('../models/Review');
+
 const bcrypt = require('bcrypt');
 const { protect, admin, approvedAccount } = require('../middleware/authMiddleware');
 const devStore = require('../utils/devStore');
@@ -311,8 +310,6 @@ router.delete('/profile', protect, approvedAccount, async (req, res) => {
 
     await Promise.all([
       Notification.deleteMany({ userId: user._id }),
-      Wishlist.deleteMany({ userId: user._id }),
-      Review.deleteMany({ userId: user._id }),
       User.deleteOne({ _id: user._id }),
     ]);
 
