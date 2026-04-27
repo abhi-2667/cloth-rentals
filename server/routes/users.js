@@ -364,7 +364,7 @@ router.get('/', protect, approvedAccount, admin, async (req, res) => {
       return res.json(devStore.listUsers());
     }
 
-    const users = await User.find().select('_id name email role approvalStatus createdAt').sort({ createdAt: -1 });
+   const users = await User.find().select('_id name email role approvalStatus createdAt phone address').sort({ createdAt: -1 });
     res.json(users.map(toSafeUser));
   } catch (error) {
     res.status(500).json({ message: error.message });
