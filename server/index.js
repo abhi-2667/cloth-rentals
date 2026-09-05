@@ -120,10 +120,18 @@ app.use((err, req, res, next) => {
   return res.status(statusCode).json({ message });
 });
 
-// Basic Route
-app.get('/', (req, res) => {
-  res.send('Cloth Rental API Server is running...');
-});
+// Serve frontend in production
+const clientDistPath = path.resolve(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send('Cloth Rental API Server is running...');
+  });
+}
 
 // Create upload directory if it doesn't exist for local testing fallback
 if (!fs.existsSync(uploadsDir)) {
