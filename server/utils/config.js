@@ -1,4 +1,6 @@
-const useDevStore = !process.env.MONGO_URI;
+const mongoose = require('mongoose');
+
+const getUseDevStore = () => !process.env.MONGO_URI || mongoose.connection.readyState !== 1;
 const getJwtSecret = () => process.env.JWT_SECRET || 'dev-secret';
 const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
 
@@ -32,7 +34,7 @@ const demoLoginAccounts = {
 };
 
 module.exports = {
-  useDevStore,
+  get useDevStore() { return getUseDevStore(); },
   getJwtSecret,
   normalizeEmail,
   getApprovalStatus,

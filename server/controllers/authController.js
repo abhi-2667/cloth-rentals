@@ -3,7 +3,8 @@ const Notification = require('../models/Notification');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const devStore = require('../utils/devStore');
-const { useDevStore, getJwtSecret, normalizeEmail, isApprovedUser, toSafeUser, demoLoginAccounts } = require('../utils/config');
+const { getJwtSecret, normalizeEmail, isApprovedUser, toSafeUser, demoLoginAccounts } = require('../utils/config');
+const config = require('../utils/config');
 
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, getJwtSecret(), {
@@ -14,7 +15,7 @@ const generateToken = (id, role) => {
 const ensureDemoMongoUser = async (email) => {
   const normalizedEmail = normalizeEmail(email);
   const demo = demoLoginAccounts[normalizedEmail];
-  if (!demo || useDevStore) return;
+  if (!demo || config.useDevStore) return;
 
   const hashedPassword = await bcrypt.hash(demo.password, 10);
   await User.updateOne(
@@ -53,7 +54,7 @@ const buildAdminApprovalLink = (req, pendingUserId) => {
 };
 
 const getFirstApprovedAdmin = async () => {
-  if (useDevStore) {
+  if (config.useDevStore) {
     return devStore.listUsers().find(
       (user) => user.role === 'admin' && (user.approvalStatus || 'approved') === 'approved'
     ) || null;
@@ -75,7 +76,7 @@ const notifyAdminAboutPendingSignup = async ({ req, pendingUser }) => {
   const notificationTitle = 'New signup awaiting approval';
   const notificationMessage = `${pendingUser.name} (${pendingUser.email}) is waiting for review.`;
 
-  if (useDevStore) {
+  if (config.useDevStore) {
     const existing = devStore.listNotificationsForUser(adminUserId).find((n) =>
       n.type === 'account' &&
       n.metadata?.kind === 'signup-approval' &&
@@ -118,7 +119,7 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'Name, email, and password are required' });
     }
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       const userExists = devStore.findUserByEmail(normalizedEmail);
       if (userExists) return res.status(400).json({ message: 'User already exists' });
 
@@ -174,7 +175,7 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
     const normalizedEmail = normalizeEmail(email);
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       const user = devStore.findUserByEmail(normalizedEmail);
 
       if (user && !isApprovedUser(user)) {

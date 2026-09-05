@@ -13,9 +13,8 @@ const {
   validateApprovalPayload,
   validateProfileUpdatePayload,
 } = require('../middleware/validationMiddleware');
-const { useDevStore: isDevStore, normalizeEmail, toSafeUser } = require('../utils/config');
-
-const useDevStore = isDevStore;
+const { normalizeEmail, toSafeUser } = require('../utils/config');
+const config = require('../utils/config');
 
 const buildActivitySummary = ({ users, bookings }) => {
   const now = new Date();
@@ -129,7 +128,7 @@ const buildActivitySummary = ({ users, bookings }) => {
 
 router.get('/activity-summary', protect, approvedAccount, admin, async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       const users = devStore.listUsers();
       const bookings = devStore.getAllBookings();
       return res.json(buildActivitySummary({ users, bookings }));
@@ -148,7 +147,7 @@ router.get('/activity-summary', protect, approvedAccount, admin, async (req, res
 
 router.get('/profile', protect, approvedAccount, async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       const user = devStore.getUserById(req.user.id);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
@@ -170,7 +169,7 @@ router.get('/profile', protect, approvedAccount, async (req, res) => {
 
 router.put('/profile', protect, approvedAccount, validateProfileUpdatePayload, async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       const user = devStore.getUserById(req.user.id);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
@@ -253,7 +252,7 @@ router.delete('/profile', protect, approvedAccount, async (req, res) => {
       return res.status(400).json({ message: 'Password is required to delete account' });
     }
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       const user = devStore.getUserById(req.user.id);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
@@ -311,7 +310,7 @@ router.delete('/profile', protect, approvedAccount, async (req, res) => {
 
 router.get('/notifications', protect, approvedAccount, async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       return res.json(devStore.listNotificationsForUser(req.user.id));
     }
 
@@ -324,7 +323,7 @@ router.get('/notifications', protect, approvedAccount, async (req, res) => {
 
 router.put('/notifications/:id/read', protect, approvedAccount, validateObjectIdParam('id', 'notification ID'), async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       const notification = devStore.markNotificationAsRead(req.params.id, req.user.id);
       if (!notification) {
         return res.status(404).json({ message: 'Notification not found' });
@@ -350,7 +349,7 @@ router.put('/notifications/:id/read', protect, approvedAccount, validateObjectId
 
 router.get('/', protect, approvedAccount, admin, async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       return res.json(devStore.listUsers());
     }
 
@@ -369,7 +368,7 @@ router.put('/:id/role', protect, approvedAccount, admin, validateObjectIdParam('
       return res.status(400).json({ message: 'Role must be either user or admin' });
     }
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       const targetUser = devStore.getUserById(req.params.id);
       if (!targetUser) {
         return res.status(404).json({ message: 'User not found' });
@@ -427,7 +426,7 @@ router.put('/:id/approval', protect, approvedAccount, admin, validateObjectIdPar
       return res.status(400).json({ message: 'Approval status must be approved, rejected, or pending' });
     }
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       const targetUser = devStore.getUserById(req.params.id);
       if (!targetUser) {
         return res.status(404).json({ message: 'User not found' });

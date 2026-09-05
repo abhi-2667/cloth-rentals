@@ -2,10 +2,10 @@ const Booking = require('../models/Booking');
 const Cloth = require('../models/Cloth');
 const Notification = require('../models/Notification');
 const devStore = require('../utils/devStore');
-const { useDevStore } = require('../utils/config');
+const config = require('../utils/config');
 
 const createUserNotification = async ({ userId, type, title, message, metadata = {} }) => {
-  if (useDevStore) {
+  if (config.useDevStore) {
     return devStore.addNotification({ userId, type, title, message, metadata });
   }
 
@@ -22,7 +22,7 @@ const createBooking = async (req, res) => {
   try {
     const { clothId, startDate, endDate } = req.body;
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       const today = new Date();
@@ -129,7 +129,7 @@ const getBlockedDatesForCloth = async (req, res) => {
   try {
     const { clothId } = req.params;
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       return res.json(devStore.getBlockedRangesForCloth(clothId));
     }
 
@@ -153,7 +153,7 @@ const getBlockedDatesForCloth = async (req, res) => {
 
 const getUserBookings = async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       return res.json(devStore.listBookings({ userId: req.user.id, includeCloth: true }));
     }
 
@@ -166,7 +166,7 @@ const getUserBookings = async (req, res) => {
 
 const getAllBookings = async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       return res.json(devStore.getAllBookings());
     }
 
@@ -181,7 +181,7 @@ const cancelBooking = async (req, res) => {
   try {
     const bookingId = req.params.id;
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       const booking = devStore.getBookingById(bookingId);
       if (!booking || booking.userId !== req.user.id) {
         return res.status(404).json({ message: 'Booking not found' });
@@ -242,7 +242,7 @@ const cancelBooking = async (req, res) => {
 
 const returnCloth = async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       const booking = devStore.updateBooking(req.params.id, { status: 'returned' });
       if (!booking) return res.status(404).json({ message: 'Booking not found' });
 
@@ -281,7 +281,7 @@ const returnCloth = async (req, res) => {
 
 const requestReturn = async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       const booking = devStore.getBookingById(req.params.id);
       if (!booking || booking.userId !== req.user.id) return res.status(404).json({ message: 'Booking not found' });
       if (booking.status !== 'booked') return res.status(400).json({ message: 'Can only return active bookings' });

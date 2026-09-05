@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const devStore = require('./utils/devStore');
 const { seedMongoDemoDataIfEmpty } = require('./utils/bootstrapMongo');
-const { useDevStore } = require('./utils/config');
+const config = require('./utils/config');
 
 dotenv.config();
 
@@ -99,7 +99,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get('/api/ready', (req, res) => {
-  const dbReady = useDevStore ? true : mongoose.connection.readyState === 1;
+  const dbReady = config.useDevStore ? true : mongoose.connection.readyState === 1;
   if (!dbReady) {
     return res.status(503).json({ status: 'not_ready' });
   }
@@ -142,7 +142,7 @@ const shutdown = async (signal) => {
     await new Promise((resolve) => httpServer.close(resolve));
   }
 
-  if (!useDevStore && mongoose.connection.readyState !== 0) {
+  if (!config.useDevStore && mongoose.connection.readyState !== 0) {
     await mongoose.disconnect();
   }
 
@@ -150,28 +150,31 @@ const shutdown = async (signal) => {
 };
 
 const startServer = async () => {
-  try {
-    if (useDevStore) {
-      await devStore.seedInventory();
-      console.warn('MONGO_URI is not set. Using the built-in development data store.');
-    } else {
+  let useMongo = false;
+
+  if (!config.useDevStore) {
+    try {
       await mongoose.connect(process.env.MONGO_URI);
-
-      const seeded = await seedMongoDemoDataIfEmpty();
-      if (seeded.usersInserted > 0 || seeded.clothesInserted > 0) {
-        console.log(`Seeded Mongo demo data: ${seeded.usersInserted} users, ${seeded.clothesInserted} clothes`);
-      }
-
       console.log('Connected to MongoDB');
+      useMongo = true;
+    } catch (err) {
+      console.error('MongoDB connection failed, falling back to dev store:', err.message);
     }
-
-    httpServer = app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
   }
+
+  if (!useMongo) {
+    await devStore.seedInventory();
+    console.warn('Using the built-in development data store.');
+  } else {
+    const seeded = await seedMongoDemoDataIfEmpty();
+    if (seeded.usersInserted > 0 || seeded.clothesInserted > 0) {
+      console.log(`Seeded Mongo demo data: ${seeded.usersInserted} users, ${seeded.clothesInserted} clothes`);
+    }
+  }
+
+  httpServer = app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 };
 
 startServer();

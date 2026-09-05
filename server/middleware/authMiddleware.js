@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const devStore = require('../utils/devStore');
-const { useDevStore, getJwtSecret } = require('../utils/config');
+const config = require('../utils/config');
+
+const { getJwtSecret } = config;
 
 const protect = (req, res, next) => {
   let token;
@@ -37,7 +39,7 @@ const approvedAccount = async (req, res, next) => {
       return res.status(401).json({ message: 'Not authorized, no token' });
     }
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       const user = devStore.getUserById(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });

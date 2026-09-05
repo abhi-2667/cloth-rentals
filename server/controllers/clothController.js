@@ -1,11 +1,11 @@
 const Cloth = require('../models/Cloth');
 const Booking = require('../models/Booking');
 const devStore = require('../utils/devStore');
-const { useDevStore } = require('../utils/config');
+const config = require('../utils/config');
 
 const getClothes = async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       return res.json(devStore.listClothes(req.query));
     }
 
@@ -73,7 +73,7 @@ const getClothes = async (req, res) => {
 
 const getClothById = async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       const cloth = devStore.getClothById(req.params.id);
       if (!cloth) return res.status(404).json({ message: 'Cloth not found' });
       return res.json(cloth);
@@ -100,7 +100,7 @@ const addCloth = async (req, res) => {
       return res.status(400).json({ message: 'Image is required' });
     }
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       const cloth = devStore.addCloth({
         title,
         description,
@@ -154,7 +154,7 @@ const updateCloth = async (req, res) => {
       updateFields.imageUrl = req.file.path;
     }
 
-    if (useDevStore) {
+    if (config.useDevStore) {
       const cloth = devStore.updateCloth(req.params.id, updateFields);
       if (!cloth) return res.status(404).json({ message: 'Cloth not found' });
       return res.json(cloth);
@@ -171,7 +171,7 @@ const updateCloth = async (req, res) => {
 
 const deleteCloth = async (req, res) => {
   try {
-    if (useDevStore) {
+    if (config.useDevStore) {
       const cloth = devStore.deleteCloth(req.params.id);
       if (!cloth) return res.status(404).json({ message: 'Cloth not found' });
       return res.json({ message: 'Cloth removed' });
