@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
 const { getClothes, getClothById, addCloth, updateCloth, deleteCloth } = require('../controllers/clothController');
 const { protect, admin, approvedAccount } = require('../middleware/authMiddleware');
 const { validateClothPayload, validateObjectIdParam } = require('../middleware/validationMiddleware');

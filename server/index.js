@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const devStore = require('./utils/devStore');
 const { seedMongoDemoDataIfEmpty } = require('./utils/bootstrapMongo');
+const { useDevStore } = require('./utils/config');
 
 dotenv.config();
 
@@ -77,7 +78,6 @@ app.use('/api', globalLimiter);
 
 // Main Entry Point
 const PORT = process.env.PORT || 5000;
-const useDevStore = !process.env.MONGO_URI;
 const uploadsDir = path.resolve(__dirname, 'uploads');
 
 // Routes

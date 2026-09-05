@@ -1,12 +1,12 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const { demoLoginAccounts } = require('./config');
 
 const state = {
   users: [],
   clothes: [],
   bookings: [],
   notifications: [],
-  pendingSignups: [],
 };
 
 const createId = () => crypto.randomUUID().replace(/-/g, '').slice(0, 24);
@@ -418,34 +418,22 @@ const seedInventory = async () => {
     }));
 
   if (state.users.length === 0) {
-    const [adminPassword, userPassword] = await Promise.all([
-      bcrypt.hash('Admin1234!', 10),
-      bcrypt.hash('User1234!', 10),
-    ]);
-
     const now = new Date().toISOString();
-    state.users.push(
-      {
+    const entries = Object.entries(demoLoginAccounts);
+
+    for (const [email, account] of entries) {
+      const hashedPassword = await bcrypt.hash(account.password, 10);
+      state.users.push({
         _id: createId(),
-        name: 'Studio Admin',
-        email: 'admin@cloth-rental.local',
-        password: adminPassword,
-        role: 'admin',
-        approvalStatus: 'approved',
+        name: account.name,
+        email,
+        password: hashedPassword,
+        role: account.role,
+        approvalStatus: account.approvalStatus,
         createdAt: now,
         updatedAt: now,
-      },
-      {
-        _id: createId(),
-        name: 'Studio User',
-        email: 'user@cloth-rental.local',
-        password: userPassword,
-        role: 'user',
-        approvalStatus: 'approved',
-        createdAt: now,
-        updatedAt: now,
-      }
-    );
+      });
+    }
   }
 };
 
@@ -613,14 +601,9 @@ const deleteUserAccount = (userId) => {
 
   state.notifications = state.notifications.filter((notification) => notification.userId !== normalizedUserId);
 
-  const normalizedEmail = String(user.email || '').toLowerCase();
-  state.pendingSignups = state.pendingSignups.filter((item) => item.email.toLowerCase() !== normalizedEmail);
-
   const [removedUser] = state.users.splice(userIndex, 1);
   return { ok: true, user: clone(removedUser) };
 };
-
-const countApprovedUsers = () => state.users.filter((user) => (user.approvalStatus || 'approved') === 'approved').length;
 
 const createBooking = (data) => {
   const booking = {
@@ -699,44 +682,6 @@ const listBookings = ({ userId, clothId, status, includeCloth = false, includeUs
 
 const getAllBookings = () => listBookings({ includeCloth: true, includeUser: true });
 
-const upsertPendingSignup = ({ name, email, password, linkExpiresAt }) => {
-  const normalizedEmail = String(email).toLowerCase();
-  const existingIndex = state.pendingSignups.findIndex((item) => item.email.toLowerCase() === normalizedEmail);
-  const record = {
-    _id: existingIndex >= 0 ? state.pendingSignups[existingIndex]._id : createId(),
-    name,
-    email,
-    password,
-    linkExpiresAt: new Date(linkExpiresAt).toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdAt: existingIndex >= 0 ? state.pendingSignups[existingIndex].createdAt : new Date().toISOString(),
-  };
-
-  if (existingIndex >= 0) {
-    state.pendingSignups[existingIndex] = record;
-  } else {
-    state.pendingSignups.push(record);
-  }
-
-  return clone(record);
-};
-
-const getPendingSignupByEmail = (email) => {
-  const normalizedEmail = String(email).toLowerCase();
-  const record = state.pendingSignups.find((item) => item.email.toLowerCase() === normalizedEmail);
-  return record ? clone(record) : null;
-};
-
-const deletePendingSignup = (email) => {
-  const normalizedEmail = String(email).toLowerCase();
-  const index = state.pendingSignups.findIndex((item) => item.email.toLowerCase() === normalizedEmail);
-  if (index === -1) return null;
-  const [removed] = state.pendingSignups.splice(index, 1);
-  return clone(removed);
-};
-
-
-
 const addNotification = ({ userId, type, title, message, metadata }) => {
   const notification = {
     _id: createId(),
@@ -794,10 +739,6 @@ module.exports = {
   listBookings,
   getAllBookings,
   getUnavailableClothIdsForRange,
-
-  upsertPendingSignup,
-  getPendingSignupByEmail,
-  deletePendingSignup,
   addNotification,
   listNotificationsForUser,
   markNotificationAsRead,

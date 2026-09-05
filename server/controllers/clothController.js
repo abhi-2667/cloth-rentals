@@ -1,8 +1,7 @@
 const Cloth = require('../models/Cloth');
 const Booking = require('../models/Booking');
 const devStore = require('../utils/devStore');
-
-const useDevStore = !process.env.MONGO_URI;
+const { useDevStore } = require('../utils/config');
 
 const getClothes = async (req, res) => {
   try {

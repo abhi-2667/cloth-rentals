@@ -2,8 +2,7 @@ const Booking = require('../models/Booking');
 const Cloth = require('../models/Cloth');
 const Notification = require('../models/Notification');
 const devStore = require('../utils/devStore');
-
-const useDevStore = !process.env.MONGO_URI;
+const { useDevStore } = require('../utils/config');
 
 const createUserNotification = async ({ userId, type, title, message, metadata = {} }) => {
   if (useDevStore) {

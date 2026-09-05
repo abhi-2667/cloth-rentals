@@ -3,31 +3,12 @@ const Notification = require('../models/Notification');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const devStore = require('../utils/devStore');
-
-const useDevStore = !process.env.MONGO_URI;
-const getJwtSecret = () => process.env.JWT_SECRET || 'dev-secret';
+const { useDevStore, getJwtSecret, normalizeEmail, isApprovedUser, toSafeUser, demoLoginAccounts } = require('../utils/config');
 
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, getJwtSecret(), {
     expiresIn: process.env.JWT_EXPIRES_IN || '30d',
   });
-};
-
-const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
-
-const demoLoginAccounts = {
-  'admin@cloth-rental.local': {
-    name: 'Studio Admin',
-    role: 'admin',
-    approvalStatus: 'approved',
-    password: 'Admin1234!',
-  },
-  'user@cloth-rental.local': {
-    name: 'Studio User',
-    role: 'user',
-    approvalStatus: 'approved',
-    password: 'User1234!',
-  },
 };
 
 const ensureDemoMongoUser = async (email) => {
@@ -55,20 +36,6 @@ const findUserByEmailInsensitive = async (email) => {
   const escaped = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return User.findOne({ email: new RegExp(`^${escaped}$`, 'i') });
 };
-
-const getApprovalStatus = (user) => user?.approvalStatus || 'approved';
-const isApprovedUser = (user) => getApprovalStatus(user) === 'approved';
-
-const toSafeUser = (user) => ({
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-  approvalStatus: getApprovalStatus(user),
-  address: user.address || '',
-  phone: user.phone || '',
-  createdAt: user.createdAt,
-});
 
 const getClientBaseUrl = (req) => {
   const configured = String(process.env.CLIENT_URL || '').trim();
@@ -226,38 +193,35 @@ const loginUser = async (req, res) => {
 
     await ensureDemoMongoUser(normalizedEmail);
 
-    const escaped = normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const users = await User.find({ email: new RegExp(`^${escaped}$`, 'i') });
+    const user = await findUserByEmailInsensitive(normalizedEmail);
 
-    if (!users.length) {
+    if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    for (const user of users) {
-      let passwordMatches = false;
+    let passwordMatches = false;
 
-      if (typeof user.password === 'string' && user.password.startsWith('$2')) {
-        passwordMatches = await bcrypt.compare(password, user.password);
-      } else if (String(user.password || '') === String(password)) {
-        // Upgrade legacy plain-text passwords
-        user.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
-        await user.save();
-        passwordMatches = true;
-      }
-
-      if (!passwordMatches) continue;
-
-      if (!isApprovedUser(user)) {
-        return res.status(403).json({ message: 'Account pending admin approval' });
-      }
-
-      return res.json({
-        user: toSafeUser(user),
-        token: generateToken(user._id, user.role),
-      });
+    if (typeof user.password === 'string' && user.password.startsWith('$2')) {
+      passwordMatches = await bcrypt.compare(password, user.password);
+    } else if (String(user.password || '') === String(password)) {
+      // Upgrade legacy plain-text passwords
+      user.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
+      await user.save();
+      passwordMatches = true;
     }
 
-    return res.status(401).json({ message: 'Invalid email or password' });
+    if (!passwordMatches) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    if (!isApprovedUser(user)) {
+      return res.status(403).json({ message: 'Account pending admin approval' });
+    }
+
+    return res.json({
+      user: toSafeUser(user),
+      token: generateToken(user._id, user.role),
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

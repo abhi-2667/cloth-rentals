@@ -1,10 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const devStore = require('../utils/devStore');
-
-const useDevStore = !process.env.MONGO_URI;
-
-const getJwtSecret = () => process.env.JWT_SECRET || 'dev-secret';
+const { useDevStore, getJwtSecret } = require('../utils/config');
 
 const protect = (req, res, next) => {
   let token;

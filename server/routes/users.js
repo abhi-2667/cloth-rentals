@@ -13,19 +13,9 @@ const {
   validateApprovalPayload,
   validateProfileUpdatePayload,
 } = require('../middleware/validationMiddleware');
+const { useDevStore: isDevStore, normalizeEmail, toSafeUser } = require('../utils/config');
 
-const useDevStore = !process.env.MONGO_URI;
-const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
-const toSafeUser = (user) => ({
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-  approvalStatus: user.approvalStatus || 'approved',
-  address: user.address || '',
-  phone: user.phone || '',
-  createdAt: user.createdAt,
-});
+const useDevStore = isDevStore;
 
 const buildActivitySummary = ({ users, bookings }) => {
   const now = new Date();

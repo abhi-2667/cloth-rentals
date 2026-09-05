@@ -455,116 +455,9 @@ input[type="date"].form-control {
 /* ============================================================
    HERO
    ============================================================ */
-.hero-shell {
-  position: relative;
-  overflow: hidden;
-  padding: clamp(2rem, 5vw, 4rem);
-}
-
-.hero-shell::before {
-  content: '';
-  position: absolute;
-  inset: -150px auto auto -100px;
-  width: 350px;
-  height: 350px;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.2), transparent 70%);
-  filter: blur(50px);
-  pointer-events: none;
-}
-
-.hero-shell::after {
-  content: '';
-  position: absolute;
-  inset: auto -100px -150px auto;
-  width: 300px;
-  height: 300px;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(45, 139, 131, 0.18), transparent 70%);
-  filter: blur(40px);
-  pointer-events: none;
-}
-
-.hero-grid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 3rem;
-  align-items: center;
-}
-
-.hero-title {
-  font-size: clamp(2.5rem, 7vw, 5rem);
-  line-height: 1.05;
-  letter-spacing: -0.05em;
-  margin-bottom: 1.2rem;
-  font-weight: 800;
-}
-
-.hero-title .accent {
-  background: linear-gradient(135deg, var(--primary-color), #ffe87c);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-kpis {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin-top: 1.4rem;
-}
-
-.kpi-card {
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 0.9rem;
-  background: rgba(255, 255, 255, 0.03);
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-.kpi-card:hover {
-  border-color: rgba(212, 175, 55, 0.3);
-  background: rgba(212, 175, 55, 0.05);
-}
-
-.kpi-value {
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.kpi-label {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-top: 0.15rem;
-}
-
-.showcase-stack {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.showcase-tile {
-  border-radius: 14px;
-  border: 1px solid var(--glass-border);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
-  padding: 1rem;
-  min-height: 115px;
-  transition: border-color 0.2s ease;
-}
-
-.showcase-tile:hover {
-  border-color: rgba(212, 175, 55, 0.25);
-}
-
-.showcase-tile strong {
-  display: block;
-  margin-bottom: 0.2rem;
-}
-
-/* Insight chips */
+/* ============================================================
+   INSIGHT CHIPS
+   ============================================================ */
 .home-insight-strip {
   display: flex;
   flex-wrap: wrap;
@@ -587,115 +480,6 @@ input[type="date"].form-control {
 /* ============================================================
    OCCASIONS
    ============================================================ */
-.occasion-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.9rem;
-}
-
-.occasion-subtitle {
-  text-align: center;
-  color: var(--text-muted);
-  margin: -0.5rem auto 1.2rem;
-  max-width: 560px;
-  font-size: 0.95rem;
-}
-
-.occasion-card {
-  appearance: none;
-  border: 1px solid var(--glass-border);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
-  color: var(--text-main);
-  text-align: left;
-  cursor: pointer;
-  padding: 1.1rem;
-  min-height: 180px;
-  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
-  border-radius: 14px;
-}
-
-.occasion-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(212, 175, 55, 0.5);
-  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.12);
-}
-
-.occasion-card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--accent-color);
-}
-
-.occasion-tag {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  border-radius: 999px;
-  padding: 0.23rem 0.55rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.occasion-card h3 {
-  margin-top: 0.72rem;
-  margin-bottom: 0.35rem;
-  font-size: 1.08rem;
-}
-
-.occasion-card p {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.occasion-link {
-  margin-top: 0.85rem;
-  display: inline-block;
-  color: var(--accent-color);
-  font-size: 0.86rem;
-  font-weight: 600;
-}
-
-/* Journey / How it works */
-.journey-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1rem;
-}
-
-.home-trust-strip {
-  padding: 1.3rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.trust-points {
-  display: grid;
-  gap: 0.45rem;
-}
-
-.trust-points span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.86rem;
-  color: var(--text-muted);
-}
-
-.value-card {
-  padding: 1.3rem;
-  transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-.value-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(212, 175, 55, 0.3);
-}
-
 /* ============================================================
    CATALOG CARDS
    ============================================================ */
@@ -715,14 +499,6 @@ input[type="date"].form-control {
   height: 290px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.2);
-}
-
-.catalog-card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain !important;
-  object-position: center top !important;
-  transition: transform 0.45s ease !important;
 }
 
 .catalog-card-content {
@@ -745,12 +521,6 @@ input[type="date"].form-control {
   font-size: 0.9rem;
   line-height: 1.6;
   min-height: 3.2em;
-}
-
-.catalog-card-meta-row {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
 .catalog-price-row {
@@ -871,33 +641,10 @@ input[type="date"].form-control {
   height: 320px;        /* change from 238px */
 }
 
-.catalog-image-cta:hover {
-  background: rgba(212, 175, 55, 0.92);
-  border-color: rgba(212, 175, 55, 0.9);
-  color: #1a2638;
-}
-
-.catalog-avail-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
 /* ============================================================
    BOOKING PAGE
    ============================================================ */
-.booking-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.booking-layout,
-.booking-hero {
+.booking-layout {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
   gap: 1rem;
@@ -945,8 +692,7 @@ input[type="date"].form-control {
 }
 
 .booking-panel,
-.booking-form,
-.booking-info-card {
+.booking-form {
   padding: 1.15rem;
 }
 
@@ -974,10 +720,6 @@ input[type="date"].form-control {
   line-height: 1.65;
 }
 
-.booking-content-grid {
-  display: block;
-}
-
 .booking-price-stack {
   display: flex;
   flex-direction: column;
@@ -1003,8 +745,7 @@ input[type="date"].form-control {
   border: 1px solid var(--glass-border);
 }
 
-.booking-meta-label,
-.booking-summary-label {
+.booking-meta-label {
   display: block;
   font-size: 0.78rem;
   color: var(--text-muted);
@@ -1018,43 +759,6 @@ input[type="date"].form-control {
   align-items: center;
   gap: 0.35rem;
   font-size: 1.05rem;
-}
-
-.booking-status-strip {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.75rem;
-  align-items: center;
-  padding-top: 0.4rem;
-}
-
-.booking-status-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.45rem 0.8rem;
-  border-radius: 999px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-}
-
-.booking-status-chip.is-live {
-  background: rgba(16, 185, 129, 0.14);
-  color: #9cf3cf;
-}
-
-.booking-status-chip.is-offline {
-  background: rgba(239, 68, 68, 0.14);
-  color: #ffb1b1;
-}
-
-.booking-status-note {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--text-muted);
-  font-size: 0.88rem;
 }
 
 .booking-content-grid {
@@ -1210,24 +914,6 @@ input[type="date"].form-control {
   border: 1px solid rgba(212, 175, 55, 0.35);
 }
 
-.booking-range-summary {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.booking-summary-card {
-  padding: 1rem;
-  border-radius: 14px;
-  border: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.booking-summary-card strong {
-  display: block;
-  font-size: 1.05rem;
-}
-
 /* ============================================================
    BROWSE PAGE
    ============================================================ */
@@ -1235,66 +921,6 @@ input[type="date"].form-control {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-.browse-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.9fr);
-  gap: 1rem;
-  align-items: end;
-  padding: 1.25rem;
-  border: 1px solid #2a2a3a;
-  background:
-    radial-gradient(circle at top left, rgba(212, 175, 55, 0.16), transparent 28%),
-    rgba(255, 255, 255, 0.02);
-}
-
-.browse-hero-copy h1 {
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1;
-  letter-spacing: -0.05em;
-  margin: 0.25rem 0 0.55rem;
-}
-
-.browse-hero-copy p {
-  color: var(--text-muted);
-  max-width: 60ch;
-}
-
-.browse-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--accent-color);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.browse-hero-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.browse-stat-card {
-  padding: 0.9rem;
-  border-radius: 14px;
-  border: 1px solid var(--glass-border);
-  background: rgba(0, 0, 0, 0.16);
-}
-
-.browse-stat-label {
-  display: block;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  margin-bottom: 0.3rem;
-}
-
-.browse-stat-card strong {
-  font-size: 1rem;
-  letter-spacing: -0.02em;
 }
 
 .browse-chip-row {
@@ -1309,13 +935,6 @@ input[type="date"].form-control {
 
 .browse-chip.is-active {
   box-shadow: 0 10px 24px rgba(212, 175, 55, 0.18);
-}
-
-.browse-search-panel,
-.browse-filters-panel {
-  padding: 1.1rem;
-  border: 1px solid #2a2a3a;
-  background: rgba(255, 255, 255, 0.02);
 }
 
 .browse-panel-head {
@@ -1355,19 +974,8 @@ input[type="date"].form-control {
   gap: 1rem;
 }
 
-.browse-search-field,
-.browse-sort-field {
-  margin-bottom: 0;
-}
-
 .browse-clear-btn {
   flex-shrink: 0;
-}
-
-.browse-filters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.85rem;
 }
 
 .browse-grid {
@@ -1463,6 +1071,10 @@ input[type="date"].form-control {
   grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
   gap: 0.85rem;
 }
+
+/* ============================================================
+   PROFILE STATS
+   ============================================================ */
 
 /* ============================================================
    PROFILE STATS
